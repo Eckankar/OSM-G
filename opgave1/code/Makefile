@@ -1,6 +1,6 @@
 CC			=gcc
-CFLAGS 		=-Wall -pedantic -Wextra -std=c99 -ggdb
-#LDFLAGS		=-lpthread
+CFLAGS		=-Wall -pedantic -Wextra -std=c99 -ggdb
+#LDFLAGS	=-lpthread
 EXECUTABLE =opg1
 
 main: bintree.o util.o main.o dlist.o
