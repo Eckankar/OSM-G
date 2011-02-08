@@ -1,3 +1,4 @@
+/* vim:foldmethod=marker */
 #include <stdlib.h>
 #include <stdio.h>
 #include "bintree.h"
