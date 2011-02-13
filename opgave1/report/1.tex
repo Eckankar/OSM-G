@@ -1,0 +1,40 @@
+\section{Task 1}
+\subsection{The insert function}
+The idea behind the \mono{insert} function is to insert an element into
+a Binary Search Tree(BST), such that the tree continues to be a BST. We've
+chosen to also allow \mono{insert} to work with a null reference passed as
+the first argument, allowing you to create the initial root of the tree through
+the function.
+
+The function makes sure to allocate memory for the node as appropriate, making
+sure that if memory is not available an appropriate exit message is printed. The
+utility function responsible for this is \mono{verify\_malloc}, 
+found in \mono{util.c}.
+
+\mono{insert} is recursive, traversing through the tree until it finds the
+appropriate place that has a free leaf-node (a \mono{NULL} leaf-node), and
+then inserting the data there.
+
+\subsection{The print\_inorder function}
+The \mono{print\_inorder} function is fairly straight-forward, doing an
+in-order tree traversal of the \mono{tnode\_t} structure passed to it. It
+takes advantage of the way the call-stack works. Since each call recursively
+first makes a call to the left sub-tree, it'll keep doing so until it hits a
+\mono{NULL} node (Which is an empty leaf of one of the nodes at the bottom),
+print the parent, then the right child. This cascades up the call-stack, making
+sure that the order printed is: Left child, self, Right child.
+
+\subsection{The size function}
+The \mono{size} function works on the same basic premise 
+that \mono{print\_inorder} does, but instead of printing a message
+displaying the current value of data, it simply returns the number 1 for
+every non-null node.
+
+\subsection{The to\_array function}
+Like the two previous functions, \mono{to\_array} traverses the data structure
+in the same exact way, with an auxilliary function \mono{dump\_to\_array}. The
+auxilliary function is there, because \mono{to\_array} first sets up an int array
+and allocates appropriate space for it (With the help of the \mono{size} function).
+Then it calls \mono{dump\_to\_array}, which takes in an \mono{tnode\_t*} and
+\mono{int**}. The integer array is incremented at each call as appropriate, which
+moves the pointer to the next space that needs to be set.

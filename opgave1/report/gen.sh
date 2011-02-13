@@ -1,0 +1,1 @@
+/home/alathon/skole/gen.sh
