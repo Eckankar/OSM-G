@@ -1,0 +1,66 @@
+This file documents any major changes made to the system
+between releases. The latest changes appear at the top of the list.
+
+
+BUENOS 1.1.1 Release (2007-10-05)
+
+2007-03-20
+	* drivers/tty.h:
+	Fixed a couple of copy-paste bugs and added right shifting to
+	TTY status macros.
+
+2007-02-25
+	* kernel/interrupt.c:
+	Require at least one CPU.
+
+	* kernel/kmalloc.c, kernel/scheduler.c, lib/bitmap.c, net/network.c:
+	Added function parameter range checks.
+
+	* proc/process.c:
+	Re-insert page mappings into TLB in process_start() to
+	actually take the modified read-only bits of the pages into
+	use.
+
+2006-02-18
+	* Makefile:
+	Better buenos.tar.gz and submit-archive targets.
+
+
+BUENOS 1.1.0 Release (2006-01-13)
+
+2006-01-09
+	* doc/roadmap/*:
+	New layout + other visual changes to the roadmap.
+
+2005-08-28
+
+	* drivers/_timer.S, kernel/cswitch.S, tests/crt.S:
+	Changed assembler additions to unsigned versions.
+
+2005-05-09
+	* Changed userland binary format and Buenos kernel format from
+	ECOFF to ELF.
+
+	* Removed blocking mode from GND receive.
+
+2005-04-22
+	* fs/tfs.c:
+	TFS no longer leaks a semaphore if initialization fails.
+
+2005-03-08
+	* Added support for inter-cpu interrupts.
+
+2005-03-02
+	* doc/roadmap/roadmap.tex:
+	Fixed POP documentation
+
+2005-02-23
+	* proc/syscall.h:
+	Fixed console file handle definitions.
+
+2005-01-17
+	* net/pop.c:
+	Fixed a memory leak.
+
+
+BUENOS 1.0.2 Release (2005-01-13)

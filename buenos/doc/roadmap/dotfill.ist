@@ -1,0 +1,18 @@
+actual '@'
+quote '"'
+level '!'
+preamble
+"\n\\clearpage\\phantomsection\\begin{theindex}\\addcontentsline{toc}{chapter}{Index}\n"
+postamble
+"\n\n\\end{theindex}\n"
+item_x1   "\\hfill \n \\subitem "
+item_x2   "\\hfill \n \\subsubitem "
+delim_0   "\\dotfill "
+delim_1   "\\dotfill "
+delim_2   "\\dotfill "
+% The next lines will produce some warnings when
+% running Makeindex as they try to cover two different
+% versions of the program:
+heading_prefix   "{\\bfseries\\Large "
+heading_suffix   "\\hfil}\\nopagebreak\n"
+headings_flag       1

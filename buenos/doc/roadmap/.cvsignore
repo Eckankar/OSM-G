@@ -1,0 +1,11 @@
+*.dvi
+*.idx
+*.ilg
+*.ind
+*.log
+*.toc
+*.aux
+*.out
+color.ps
+roadmap.ps
+roadmap.pdf

@@ -1,0 +1,18 @@
+Jokaisen ei-koodaustehtävän viereen idealamppu.
+
+Jokaisen koodaustehtävän viereen näippäimistön kuva.
+
+LL/SC kuva. Jonkinlainen kuvallinen esitys onnistuneesta ja
+epäonnistuneesta RMW-sekvenssistä.
+
+Context-switch: Kuva, miten konteksteja talletetaan pinoihin.
+
+YAMS muistisegmentit.
+
+Kuinka YAMS referoi muistia (Jako segmentteihin, mahdollinen TLB:n käyttö...)
+
+YAMS TLB kuva. Parilliset ja parittomat entryt näkyviin!
+
+Miten laitteet toimii? (komento -> laite puuhailee omiaan -> irq)
+
+Miten device_t g{bcn}d_t ja "real device" viittaavat toisiinsa?
