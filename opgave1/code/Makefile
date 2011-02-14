@@ -22,5 +22,5 @@ run: main
     ./$(EXECUTABLE)
 
 clean:
-    rm *.o $(EXECUTABLE)
+	rm *.o $(EXECUTABLE)
 
