@@ -1,2 +1,19 @@
 \section{dlist\_t}
-(Diskuter din implementering af tree2dlist her, på Engelsk ;)
+
+The implementation of \mono{tree2dlist} is based off of two helping functions:
+
+\subsection{The function insert\_before}
+To make working with the circular doubly linked lists easier, we chose to
+implement a function, which inserts a node before the current one.
+
+This function takes care of properly allocating memory for the link and
+moving the pointers of the existing elements around, such that the list
+remains circular.
+
+\subsection{The function tree2dlist\_recursive}
+With \mono{insert\_before} in hand, we can perform an in-order tree walk
+on the tree, inserting the elements before the first element. Since the list
+is circular, this is equivalent to inserting the new element in the last spot.
+
+This elegantly lets us keep the first element as our current element at all
+times.

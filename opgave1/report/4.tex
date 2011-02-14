@@ -1,0 +1,30 @@
+\section{Custom functions}
+
+In order to better facilitate testing, a number of additional helper functions
+have been added.
+
+In order to free the memory we've consumed, the following functions have been
+added:
+\begin{description}
+    \item[Problem 1] {
+        \mono{delete\_tree} for recursively freeing the memory used by a tree
+        and zeroing out the pointer to it.
+    }
+    \item[Problem 2] {
+        \mono{remove\_and\_free}, which removes and frees the first element of
+        the list, moving the pointer to the next element.
+    }
+    \item[Problem 3] {
+        \mono{delete\_tree2} for recursively freeing the memory used by a tree
+        and zeroing out the pointer to it.
+
+        Note, that this does \emph{not} free the values, only the tree itself.
+        If the tree is to be used with dynamically allocated structures, an
+        elegant approach would be to pass a function pointer to a function
+        for freeing the elements contained within.
+    }
+\end{description}
+
+In addition, a \mono{print\_inorder2} was added, which prints the elements
+contained within a tree, using a custom print function, in order to verify
+the correctness of the data contained within.
