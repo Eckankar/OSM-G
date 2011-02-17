@@ -48,6 +48,9 @@
 /* Kernel print routine */
 void kwrite(char *s);
 
+/* Kernel read routine that returns the length read */
+int kread_core(char *s, int len);
+
 /* Kernel read routine */
 void kread(char *s, int len);
 
