@@ -252,6 +252,43 @@ void process_finish(uint32_t retval) {
     thread_finish();
 }
 
+
+/**
+ * Will start a process from the currently running thread,
+ * with executable as its target.
+ *
+ * Will only return on an error in process_start()
+*/
+int process_run(const char *executable) {
+    intr_status_t intr_status;
+    process_id_t pid = -1;
+
+    // Find out who we are.
+    pid = process_get_current_process();
+
+    // Ensure that we're the only ones touching the process table.
+    intr_status = _interrupt_disable();
+    spinlock_acquire(&process_table_slock);
+
+	for(int i = 0; i < MAX_PROCESSES; i++) {
+		if(process_table[i].state == PROCESS_SLOT_AVAILABLE)
+			pid = i;
+	}
+
+	// No free process slots.
+	KERNEL_ASSERT(pid != -1);
+
+	stringcopy(&process_table[pid].name, executable, MAX_NAME_LENGTH);
+	process_table[pid].state = PROCESS_READY;
+
+	// Free our locks.
+    spinlock_release(&process_table_slock);
+    _interrupt_set_state(intr_status);
+
+	process_start(&executable);
+	return -1; // This really shouldn't happen...
+}
+
 /**
  * Initializes the process table for use.
  */
