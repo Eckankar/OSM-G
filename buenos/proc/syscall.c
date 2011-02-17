@@ -51,7 +51,7 @@ int syscall_read(int fhandle, void *buffer, int length) {
 int syscall_write(int fhandle, const void *buffer, int length) {
 	if(fhandle == FILEHANDLE_STDOUT) {
 		length = length; // Assignment to self in order to avoid compiler warning
-		kwrite(buffer);
+		kwrite((char*)buffer);
 		return strlen(buffer);
 	}
 	return -1;
