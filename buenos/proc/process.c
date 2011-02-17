@@ -233,6 +233,10 @@ void process_finish(uint32_t retval) {
  * Initializes the process table for use.
  */
 void process_init() {
+    // Initialize our spinlock.
+    spinlock_reset(&process_table_slock);
+
+    // Mark all process slots as available.
     for (int i = 0; i < MAX_PROCESSES; i++) {
         process_table[i].state = PROCESS_SLOT_AVAILABLE;
     }
