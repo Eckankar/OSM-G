@@ -40,19 +40,37 @@
 #include "lib/libc.h"
 #include "kernel/assert.h"
 #include "proc/process.h"
+#include "drivers/gcd.h"
+#include "drivers/device.h"
 
 int syscall_read(int fhandle, void *buffer, int length) {
+	device_t *dev;
+	gcd_t *gcd;
+
 	if(fhandle == FILEHANDLE_STDIN) {
-		return kread_core(buffer, length);
+		dev = device_get(YAMS_TYPECODE_TTY, 0);
+		if(dev == NULL) return -1;
+
+		gcd = (gcd_t *)dev->generic_device;
+		if(gcd == NULL) return -1;
+
+		return gcd->read(gcd, buffer, length);
 	}
 	return -1;
 }
 
 int syscall_write(int fhandle, const void *buffer, int length) {
+	device_t *dev;
+	gcd_t *gcd;
+
 	if(fhandle == FILEHANDLE_STDOUT) {
-		length = length; // Assignment to self in order to avoid compiler warning
-		kwrite((char*)buffer);
-		return strlen(buffer);
+		dev = device_get(YAMS_TYPECODE_TTY, 0);
+		if(dev == NULL) return -1;
+
+		gcd = (gcd_t *)dev->generic_device;
+		if(gcd == NULL) return -1;
+
+		return gcd->write(gcd, buffer, length);
 	}
 	return -1;
 }
