@@ -58,20 +58,32 @@ void syscall_handle(context_t *user_context)
      * returning from this function the userland context will be
      * restored from user_context.
      */
-    switch(user_context->cpu_regs[MIPS_REGISTER_A0]) {
+#define ARG_REG(n) user_context->cpu_regs[MIPS_REGISTER_A##n]
+
+    switch(ARG_REG(0)) {
     case SYSCALL_HALT:
         halt_kernel();
         break;
 	case SYSCALL_READ:
-		
+		syscall_read((int)ARG_REG(1), (void *)ARG_REG(2), (int)ARG_REG(3));
+        break;
 	case SYSCALL_WRITE:
+		syscall_write((int)ARG_REG(1), (void *)ARG_REG(2), (int)ARG_REG(3));
+        break;
 	case SYSCALL_EXIT:
+        syscall_exit((int)ARG_REG(1));
+        break;
 	case SYSCALL_EXEC:
+        syscall_exec((const char *)ARG_REG(1));
+        break;
 	case SYSCALL_JOIN:
-    default: 
+        syscall_join((int)ARG_REG(1));
+        break;
+    default:
         KERNEL_PANIC("Unhandled system call\n");
     }
 
+#undef ARG_REG
     /* Move to next instruction after system call */
     user_context->pc += 4;
 }
