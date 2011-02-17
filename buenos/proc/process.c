@@ -46,6 +46,8 @@
 #include "vm/pagepool.h"
 
 
+process_t *processes[MAX_PROCESSES];
+
 /** @name Process startup
  *
  * This module contains a function to start a userland process.

@@ -37,7 +37,23 @@
 #ifndef BUENOS_PROC_PROCESS
 #define BUENOS_PROC_PROCESS
 
+#define MAX_NAME_LENGTH 255
+#define MAX_PROCESSES   64
+
 typedef int process_id_t;
+
+typedef enum {
+	PROCESS_WAITING,
+	PROCESS_RUNNING,
+	PROCESS_READY,
+	PROCESS_DYING
+} process_state_t;
+
+typedef struct {
+	char name[MAX_NAME_LENGTH];
+	int retval;
+	process_state_t state;
+} process_t;
 
 void process_start(const char *executable);
 
