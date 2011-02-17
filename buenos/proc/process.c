@@ -210,7 +210,7 @@ uint32_t process_join(process_id_t pid) {
 	intr_status = _interrupt_disable();
 	spinlock_acquire(&process_table_slock);
 
-	// Join the sleep queue
+	// Sleep while the process isn't in its "dying" state.
 	while(process_table[pid].state != PROCESS_DYING) {
 		sleepq_add(&process_table[pid]);
 		spinlock_release(&process_table_slock);
@@ -218,8 +218,9 @@ uint32_t process_join(process_id_t pid) {
 		spinlock_acquire(&process_table_slock);
 	}
 
-	// Fetch return value of thread and free the slot.
 	retval = process_table[pid].retval;
+
+    // Restore interrupts and free our lock
 	process_table[pid].state = PROCESS_ENTRY_AVAILABLE;
 	spinlock_release(&process_table_slock);
 	_interrupt_set_state(intr_status);
