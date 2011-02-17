@@ -236,8 +236,7 @@ void process_finish(uint32_t retval) {
     // Find out who we are.
     pid = process_get_current_process();
 
-    // Ensure that we're the only ones touching the
-    // process table.
+    // Ensure that we're the only ones touching the process table.
     intr_status = _interrupt_disable();
     spinlock_acquire(&process_table_slock);
 
