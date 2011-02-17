@@ -39,6 +39,7 @@
 
 #define MAX_NAME_LENGTH 255
 #define MAX_PROCESSES   64
+#define USERLAND_STACK_TOP 0x7fffeffc
 
 typedef int process_id_t;
 
@@ -51,12 +52,21 @@ typedef enum {
 
 typedef struct {
 	char name[MAX_NAME_LENGTH];
-	int retval;
+	uint32_t retval;
 	process_state_t state;
 } process_t;
 
 void process_start(const char *executable);
 
-#define USERLAND_STACK_TOP 0x7fffeffc
+process_id_t process_spawn(const char *executable );
 
+int process_run(const char *executable);
+
+process_id_t process_get_current_process( void );
+
+void process_finish(int retval);
+
+uint32_t process_join(process_id_t pid);
+
+void process_init( void );
 #endif
