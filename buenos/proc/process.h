@@ -67,8 +67,11 @@ void process_start(process_id_t pid);
 /* Run process in new thread, return PID of new process */
 process_id_t process_spawn(const char *executable);
 
+/* Obtain a process slot and set the executable name of that slot */
+process_id_t process_obtain_slot(const char *executable);
+
 /* Run process in this thread, only returns if there is an error */
-int process_run(const char *executable);
+int process_run(process_id_t pid);
 
 /* Returns the PID of the current process */
 process_id_t process_get_current_process( void );

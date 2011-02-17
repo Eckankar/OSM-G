@@ -115,6 +115,8 @@ void init_startup_fallback(void) {
 
 void init_startup_thread(uint32_t arg)
 {
+	process_id_t pid;
+
     /* Threads have arguments for functions they run, we don't
        need any. Silence the compiler warning by using the argument. */
     arg = arg;
@@ -132,7 +134,8 @@ void init_startup_thread(uint32_t arg)
 
     kprintf("Starting initial program '%s'\n", bootargs_get("initprog"));
 
-    process_run(bootargs_get("initprog"));
+	pid = process_obtain_slot(bootargs_get("initprog"));
+    process_run(pid);
 
     /* The current process_start() should never return. */
     KERNEL_PANIC("Run out of initprog.\n");
