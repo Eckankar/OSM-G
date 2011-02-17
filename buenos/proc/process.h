@@ -47,12 +47,19 @@ typedef enum {
 	PROCESS_WAITING,
 	PROCESS_RUNNING,
 	PROCESS_READY,
-	PROCESS_DYING
+	PROCESS_DYING,
+    PROCESS_SLOT_AVAILABLE
 } process_state_t;
 
 typedef struct {
+    // The name of the process.
 	char name[MAX_NAME_LENGTH];
+    // The return value of the process.
+    // Only relevant if the state is PROCESS_DYING.
 	uint32_t retval;
+    // The state of the process.
+    // Note that the values of all other fields are
+    // garbage if the state is PROCESS_SLOT_AVAILABLE.
 	process_state_t state;
 } process_t;
 
