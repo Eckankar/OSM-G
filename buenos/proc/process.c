@@ -264,16 +264,14 @@ int process_run(const char *executable) {
     intr_status_t intr_status;
     process_id_t pid = -1;
 
-    // Find out who we are.
-    pid = process_get_current_process();
-
     // Ensure that we're the only ones touching the process table.
     intr_status = _interrupt_disable();
     spinlock_acquire(&process_table_slock);
 
 	for(int i = 0; i < MAX_PROCESSES; i++) {
-		if(process_table[i].state == PROCESS_SLOT_AVAILABLE)
+		if(process_table[i].state == PROCESS_SLOT_AVAILABLE) {
 			pid = i;
+        }
 	}
 
 	// No free process slots.
@@ -288,6 +286,17 @@ int process_run(const char *executable) {
 
 	process_start(&executable);
 	return -1; // This really shouldn't happen...
+}
+
+/**
+ * Spawns a new process in a separate kernel thread, running
+ * the given executable
+ */
+process_id_t process_spawn(const char *executable) {
+    TID_t tid;
+
+    tid = thread_create(process_start, executable);
+    thread_run(tid);
 }
 
 /**
