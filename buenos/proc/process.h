@@ -37,6 +37,8 @@
 #ifndef BUENOS_PROC_PROCESS
 #define BUENOS_PROC_PROCESS
 
+#include "lib/types.h"
+
 #define MAX_NAME_LENGTH 255
 #define MAX_PROCESSES   64
 #define USERLAND_STACK_TOP 0x7fffeffc
@@ -70,14 +72,11 @@ process_id_t process_spawn(const char *executable);
 /* Obtain a process slot and set the executable name of that slot */
 process_id_t process_obtain_slot(const char *executable);
 
-/* Run process in this thread, only returns if there is an error */
-int process_run(process_id_t pid);
-
 /* Returns the PID of the current process */
 process_id_t process_get_current_process( void );
 
 /* Stop the current process and the kernel thread in which it runs */
-void process_finish(int retval);
+void process_finish(uint32_t retval);
 
 /* Wait for the given process to terminate, returning its return
  * value, and marking the process table entry as free */
