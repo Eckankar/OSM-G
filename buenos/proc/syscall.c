@@ -40,6 +40,25 @@
 #include "lib/libc.h"
 #include "kernel/assert.h"
 
+int syscall_read(int fhandle, void *buffer, int length) {
+	return 0;
+}
+
+int syscall_write(int fhandle, const void *buffer, int length) {
+	return 0;
+}
+
+void syscall_exit(int retval) {
+
+}
+
+int syscall_exec(const char *filename) {
+	return 0;
+}
+
+int syscall_join(int pid) {
+	return 0;
+}
 /**
  * Handle system calls. Interrupts are enabled when this function is
  * called.
@@ -75,3 +94,4 @@ void syscall_handle(context_t *user_context)
     /* Move to next instruction after system call */
     user_context->pc += 4;
 }
+
