@@ -38,6 +38,7 @@
 #include "proc/elf.h"
 #include "kernel/thread.h"
 #include "kernel/assert.h"
+#include "kernel/sleepq.h"
 #include "kernel/interrupt.h"
 #include "kernel/config.h"
 #include "fs/vfs.h"
@@ -102,7 +103,7 @@ void process_start(process_id_t pid) {
     spinlock_acquire(&process_table_slock);
 
     // Copy over the name of file we're supposed to execute.
-    stringcopy(executable, &process_table[pid].name, MAX_NAME_LENGTH);
+    stringcopy(executable, process_table[pid].name, MAX_NAME_LENGTH);
 
     // Free our locks.
     spinlock_release(&process_table_slock);
@@ -235,7 +236,7 @@ uint32_t process_join(process_id_t pid) {
 	retval = process_table[pid].retval;
 
     // Restore interrupts and free our lock
-	process_table[pid].state = PROCESS_ENTRY_AVAILABLE;
+	process_table[pid].state = PROCESS_SLOT_AVAILABLE;
 	spinlock_release(&process_table_slock);
 	_interrupt_set_state(intr_status);
 	return retval;
@@ -267,24 +268,10 @@ void process_finish(uint32_t retval) {
     thread_finish();
 }
 
-
-/**
- * Will start a process from the currently running thread,
- * with executable as its target.
- *
- * Will only return on an error in process_start()
- *
- * May *not* be called from a thread already running a process.
-*/
-int process_run(process_id_t pid) {
-    thread_table_t *my_entry;
-
-    // Set the thread process id
-    my_entry = thread_get_current_thread_entry();
-    my_entry->process_id = pid;
-
-	process_start(&executable);
-	return -1; // This really shouldn't happen...
+// A wrapper for process_start, such that we can
+// pass it to thread_create
+void process_start_wrapper(uint32_t pid) {
+    process_start((process_id_t) pid);
 }
 
 /**
@@ -296,7 +283,7 @@ process_id_t process_spawn(const char *executable) {
     process_id_t pid;
 
     pid = process_obtain_slot(executable);
-    tid = thread_create(process_start, pid);
+    tid = thread_create(&process_start_wrapper, (uint32_t)pid);
 
     thread_run(tid);
     return pid;
@@ -314,7 +301,8 @@ process_id_t process_obtain_slot(const char *executable) {
     spinlock_acquire(&process_table_slock);
 
     // Find a free process slot.
-	for(int i = 0; i < MAX_PROCESSES; i++) {
+    int i;
+	for(i = 0; i < MAX_PROCESSES; i++) {
 		if(process_table[i].state == PROCESS_SLOT_AVAILABLE) {
 			pid = i;
             break;
@@ -325,7 +313,7 @@ process_id_t process_obtain_slot(const char *executable) {
 	KERNEL_ASSERT(pid != -1);
 
 	process_table[pid].state = PROCESS_RUNNING;
-	stringcopy(&process_table[pid].name, executable, MAX_NAME_LENGTH);
+	stringcopy(process_table[pid].name, executable, MAX_NAME_LENGTH);
 
 	// Free our locks.
     spinlock_release(&process_table_slock);
@@ -342,7 +330,8 @@ void process_init() {
     spinlock_reset(&process_table_slock);
 
     // Mark all process slots as available.
-    for (int i = 0; i < MAX_PROCESSES; i++) {
+    int i;
+    for (i = 0; i < MAX_PROCESSES; i++) {
         process_table[i].state = PROCESS_SLOT_AVAILABLE;
     }
 }
