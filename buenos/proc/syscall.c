@@ -95,7 +95,7 @@ void syscall_handle(context_t *user_context)
 		RET_REG(0) = syscall_read((int)ARG_REG(1), (void *)ARG_REG(2), (int)ARG_REG(3));
         break;
 	case SYSCALL_WRITE:
-		RET_REG(0) = syscall_write((int)ARG_REG(1), (void *)ARG_REG(2), (int)ARG_REG(3));
+		RET_REG(0) = syscall_write((int)ARG_REG(1), (const void *)ARG_REG(2), (int)ARG_REG(3));
         break;
 	case SYSCALL_EXIT:
         syscall_exit((int)ARG_REG(1));
