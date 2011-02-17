@@ -46,7 +46,15 @@
 #include "vm/pagepool.h"
 
 
-process_t *processes[MAX_PROCESSES];
+process_t *process_table[MAX_PROCESSES];
+
+/*
+ * Re
+ */
+process_id_t process_get_current_process() {
+	thread_table_t *curEntry = thread_get_current_thread_entry();
+	return curEntry->process_id;
+}
 
 /** @name Process startup
  *
