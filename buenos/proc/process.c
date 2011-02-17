@@ -202,6 +202,30 @@ void process_start(const char *executable)
     KERNEL_PANIC("thread_goto_userland failed.");
 }
 
+uint32_t process_join(process_id_t pid) {
+	intr_status_t intr_status;
+	uint32_t retval;
+
+	// Disable interrupts and acquire resource lock
+	intr_status = _interrupt_disable();
+	spinlock_acquire(&process_table_slock);
+
+	// Join the sleep queue
+	while(process_table[pid].state != PROCESS_DYING) {
+		sleepq_add(&process_table[pid]);
+		spinlock_release(&process_table_slock);
+		thread_switch();
+		spinlock_acquire(&process_table_slock);
+	}
+
+	// Fetch return value of thread and free the slot.
+	retval = process_table[pid].retval;
+	process_table[pid].state = PROCESS_ENTRY_AVAILABLE;
+	spinlock_release(&process_table_slock);
+	_interrupt_set_state(intr_status);
+	return retval;
+}
+
 /**
  * Terminates the current process and sets a return value
  */
@@ -223,7 +247,7 @@ void process_finish(uint32_t retval) {
 
     // Free our locks.
     spinlock_release(&process_table_slock);
-    _interrupt_set_state(intr_status_t);
+    _interrupt_set_state(intr_status);
 
     // Kill the thread.
     thread_finish();
