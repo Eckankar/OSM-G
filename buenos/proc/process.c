@@ -45,8 +45,8 @@
 #include "vm/vm.h"
 #include "vm/pagepool.h"
 
-
-process_t *processes[MAX_PROCESSES];
+// The process table.
+process_t *process_table[MAX_PROCESSES];
 
 /** @name Process startup
  *
@@ -111,7 +111,7 @@ void process_start(const char *executable)
     for(i = 0; i < CONFIG_USERLAND_STACK_SIZE; i++) {
         phys_page = pagepool_get_phys_page();
         KERNEL_ASSERT(phys_page != 0);
-        vm_map(my_entry->pagetable, phys_page, 
+        vm_map(my_entry->pagetable, phys_page,
                (USERLAND_STACK_TOP & PAGE_SIZE_MASK) - i*PAGE_SIZE, 1);
     }
 
@@ -187,6 +187,15 @@ void process_start(const char *executable)
     thread_goto_userland(&user_context);
 
     KERNEL_PANIC("thread_goto_userland failed.");
+}
+
+/**
+ * Initializes the process table for use.
+ */
+void process_init() {
+    for (int i = 0; i < MAX_PROCESSES; i++) {
+        process_table[i].state = PROCESS_SLOT_AVAILABLE;
+    }
 }
 
 /** @} */
