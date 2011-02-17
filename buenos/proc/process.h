@@ -62,7 +62,7 @@ typedef struct {
 } process_t;
 
 /* Starts the process with the given filename */
-void process_start(const char *executable);
+void process_start(process_id_t pid);
 
 /* Run process in new thread, return PID of new process */
 process_id_t process_spawn(const char *executable);

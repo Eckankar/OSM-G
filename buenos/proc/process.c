@@ -78,8 +78,7 @@ process_id_t process_get_current_process() {
  * @executable The name of the executable to be run in the userland
  * process
  */
-void process_start(const char *executable)
-{
+void process_start(process_id_t pid) {
     thread_table_t *my_entry;
     pagetable_t *pagetable;
     uint32_t phys_page;
@@ -87,12 +86,27 @@ void process_start(const char *executable)
     uint32_t stack_bottom;
     elf_info_t elf;
     openfile_t file;
+    char executable[MAX_NAME_LENGTH];
 
     int i;
 
     interrupt_status_t intr_status;
 
     my_entry = thread_get_current_thread_entry();
+
+    // Set process id on thread
+    my_entry->process_id = pid;
+
+    // Ensure that we're the only ones touching the process table.
+    intr_status = _interrupt_disable();
+    spinlock_acquire(&process_table_slock);
+
+    // Copy over the name of file we're supposed to execute.
+    stringcopy(executable, &process_table[pid].name, MAX_NAME_LENGTH);
+
+    // Free our locks.
+    spinlock_release(&process_table_slock);
+    _interrupt_set_state(intr_status);
 
     /* If the pagetable of this thread is not NULL, we are trying to
        run a userland process for a second time in the same thread.
@@ -134,14 +148,14 @@ void process_start(const char *executable)
     for(i = 0; i < (int)elf.ro_pages; i++) {
         phys_page = pagepool_get_phys_page();
         KERNEL_ASSERT(phys_page != 0);
-        vm_map(my_entry->pagetable, phys_page, 
+        vm_map(my_entry->pagetable, phys_page,
                elf.ro_vaddr + i*PAGE_SIZE, 1);
     }
 
     for(i = 0; i < (int)elf.rw_pages; i++) {
         phys_page = pagepool_get_phys_page();
         KERNEL_ASSERT(phys_page != 0);
-        vm_map(my_entry->pagetable, phys_page, 
+        vm_map(my_entry->pagetable, phys_page,
                elf.rw_vaddr + i*PAGE_SIZE, 1);
     }
 
@@ -151,14 +165,14 @@ void process_start(const char *executable)
     intr_status = _interrupt_disable();
     tlb_fill(my_entry->pagetable);
     _interrupt_set_state(intr_status);
-    
+
     /* Now we may use the virtual addresses of the segments. */
 
     /* Zero the pages. */
     memoryset((void *)elf.ro_vaddr, 0, elf.ro_pages*PAGE_SIZE);
     memoryset((void *)elf.rw_vaddr, 0, elf.rw_pages*PAGE_SIZE);
 
-    stack_bottom = (USERLAND_STACK_TOP & PAGE_SIZE_MASK) - 
+    stack_bottom = (USERLAND_STACK_TOP & PAGE_SIZE_MASK) -
         (CONFIG_USERLAND_STACK_SIZE-1)*PAGE_SIZE;
     memoryset((void *)stack_bottom, 0, CONFIG_USERLAND_STACK_SIZE*PAGE_SIZE);
 
@@ -203,7 +217,7 @@ void process_start(const char *executable)
 }
 
 uint32_t process_join(process_id_t pid) {
-	intr_status_t intr_status;
+	interrupt_status_t intr_status;
 	uint32_t retval;
 
 	// Disable interrupts and acquire resource lock
@@ -231,7 +245,7 @@ uint32_t process_join(process_id_t pid) {
  * Terminates the current process and sets a return value
  */
 void process_finish(uint32_t retval) {
-    intr_status_t intr_status;
+    interrupt_status_t intr_status;
     process_id_t pid;
 
     // Find out who we are.
@@ -259,30 +273,15 @@ void process_finish(uint32_t retval) {
  * with executable as its target.
  *
  * Will only return on an error in process_start()
+ *
+ * May *not* be called from a thread already running a process.
 */
-int process_run(const char *executable) {
-    intr_status_t intr_status;
-    process_id_t pid = -1;
+int process_run(process_id_t pid) {
+    thread_table_t *my_entry;
 
-    // Ensure that we're the only ones touching the process table.
-    intr_status = _interrupt_disable();
-    spinlock_acquire(&process_table_slock);
-
-	for(int i = 0; i < MAX_PROCESSES; i++) {
-		if(process_table[i].state == PROCESS_SLOT_AVAILABLE) {
-			pid = i;
-        }
-	}
-
-	// No free process slots.
-	KERNEL_ASSERT(pid != -1);
-
-	stringcopy(&process_table[pid].name, executable, MAX_NAME_LENGTH);
-	process_table[pid].state = PROCESS_RUNNING;
-
-	// Free our locks.
-    spinlock_release(&process_table_slock);
-    _interrupt_set_state(intr_status);
+    // Set the thread process id
+    my_entry = thread_get_current_thread_entry();
+    my_entry->process_id = pid;
 
 	process_start(&executable);
 	return -1; // This really shouldn't happen...
@@ -294,9 +293,45 @@ int process_run(const char *executable) {
  */
 process_id_t process_spawn(const char *executable) {
     TID_t tid;
+    process_id_t pid;
 
-    tid = thread_create(process_start, executable);
+    pid = process_obtain_slot(executable);
+    tid = thread_create(process_start, pid);
+
     thread_run(tid);
+    return pid;
+}
+
+/**
+ * Obtains and initializes a free process table slot.
+ */
+process_id_t process_obtain_slot(const char *executable) {
+    interrupt_status_t intr_status;
+    process_id_t pid = -1;
+
+    // Ensure that we're the only ones touching the process table.
+    intr_status = _interrupt_disable();
+    spinlock_acquire(&process_table_slock);
+
+    // Find a free process slot.
+	for(int i = 0; i < MAX_PROCESSES; i++) {
+		if(process_table[i].state == PROCESS_SLOT_AVAILABLE) {
+			pid = i;
+            break;
+        }
+	}
+
+	// No free process slots.
+	KERNEL_ASSERT(pid != -1);
+
+	process_table[pid].state = PROCESS_RUNNING;
+	stringcopy(&process_table[pid].name, executable, MAX_NAME_LENGTH);
+
+	// Free our locks.
+    spinlock_release(&process_table_slock);
+    _interrupt_set_state(intr_status);
+
+    return pid;
 }
 
 /**
