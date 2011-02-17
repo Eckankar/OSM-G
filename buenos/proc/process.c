@@ -52,7 +52,7 @@
  */
 
 /** The table containing all processes in the system, whether active or not. */
-process_t *process_table[MAX_PROCESSES];
+process_t process_table[MAX_PROCESSES];
 
 /** Spinlock which must be held when manipulating the process table */
 spinlock_t process_table_slock;
