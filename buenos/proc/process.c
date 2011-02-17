@@ -280,7 +280,7 @@ int process_run(const char *executable) {
 	KERNEL_ASSERT(pid != -1);
 
 	stringcopy(&process_table[pid].name, executable, MAX_NAME_LENGTH);
-	process_table[pid].state = PROCESS_READY;
+	process_table[pid].state = PROCESS_RUNNING;
 
 	// Free our locks.
     spinlock_release(&process_table_slock);

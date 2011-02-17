@@ -44,9 +44,7 @@
 typedef int process_id_t;
 
 typedef enum {
-	PROCESS_WAITING,
 	PROCESS_RUNNING,
-	PROCESS_READY,
 	PROCESS_DYING,
     PROCESS_SLOT_AVAILABLE
 } process_state_t;
