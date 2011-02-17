@@ -45,10 +45,19 @@
 #include "vm/vm.h"
 #include "vm/pagepool.h"
 
-// The process table.
+
+/** @name Process startup
+ *
+ * This module contains a function to start a userland process.
+ */
+
+/** The table containing all processes in the system, whether active or not. */
 process_t *process_table[MAX_PROCESSES];
 
-/*
+/** Spinlock which must be held when manipulating the process table */
+spinlock_t process_table_slock;
+
+/**
  * Returns the process ID of the currently running thread.
  */
 process_id_t process_get_current_process() {
@@ -56,11 +65,6 @@ process_id_t process_get_current_process() {
 	return curEntry->process_id;
 }
 
-
-/** @name Process startup
- *
- * This module contains a function to start a userland process.
- */
 
 /**
  * Starts one userland process. The thread calling this function will
@@ -196,6 +200,33 @@ void process_start(const char *executable)
     thread_goto_userland(&user_context);
 
     KERNEL_PANIC("thread_goto_userland failed.");
+}
+
+/**
+ * Terminates the current process and sets a return value
+ */
+void process_finish(uint32_t retval) {
+    intr_status_t intr_status;
+    process_id_t pid;
+
+    // Find out who we are.
+    pid = process_get_current_process();
+
+    // Ensure that we're the only ones touching the
+    // process table.
+    intr_status = _interrupt_disable();
+    spinlock_acquire(&process_table_slock);
+
+    // Mark ourself as dying.
+    process_table[pid].retval = retval;
+    process_table[pid].state = PROCESS_DYING;
+
+    // Free our locks.
+    spinlock_release(&process_table_slock);
+    _interrupt_set_state(intr_status_t);
+
+    // Kill the thread.
+    thread_finish();
 }
 
 /**
