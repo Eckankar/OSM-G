@@ -196,6 +196,9 @@ void init(void)
     kwrite("Initializing threading system\n");
     thread_table_init();
 
+    kwrite("Initializing process table.\n");
+    process_init();
+
     kwrite("Initializing sleep queue\n");
     sleepq_init();
 
