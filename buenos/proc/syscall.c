@@ -42,11 +42,18 @@
 #include "proc/process.h"
 
 int syscall_read(int fhandle, void *buffer, int length) {
-	return 0;
+	if(fhandle == FILEHANDLE_STDIN) {
+		return kread_core(buffer, length);
+	}
+	return -1;
 }
 
 int syscall_write(int fhandle, const void *buffer, int length) {
-	return 0;
+	if(fhandle == FILEHANDLE_STDOUT) {
+		kwrite(buffer);
+		return strlen(buffer); 
+	}
+	return -1;
 }
 
 void syscall_exit(int retval) {
