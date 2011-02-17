@@ -66,9 +66,9 @@ static void perform_binop(stack_t* stack, binop op) {
     out_of_memory();
   }
   if (!stack_empty(stack)) {
-    x = stack_pop(stack);
+    y = stack_pop(stack);
     if (!stack_empty(stack)) {
-      y = stack_pop(stack);
+      x = stack_pop(stack);
       *z = (*op)(*x,*y);
       free(x);
       free(y);
