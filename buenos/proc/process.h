@@ -37,6 +37,8 @@
 #ifndef BUENOS_PROC_PROCESS
 #define BUENOS_PROC_PROCESS
 
+#include "lib/types.h"
+
 #define MAX_NAME_LENGTH 255
 #define MAX_PROCESSES   64
 #define USERLAND_STACK_TOP 0x7fffeffc
