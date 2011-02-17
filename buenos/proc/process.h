@@ -47,26 +47,43 @@ typedef enum {
 	PROCESS_WAITING,
 	PROCESS_RUNNING,
 	PROCESS_READY,
-	PROCESS_DYING
+	PROCESS_DYING,
+    PROCESS_SLOT_AVAILABLE
 } process_state_t;
 
 typedef struct {
+    // The name of the process.
 	char name[MAX_NAME_LENGTH];
+    // The return value of the process.
+    // Only relevant if the state is PROCESS_DYING.
 	uint32_t retval;
+    // The state of the process.
+    // Note that the values of all other fields are
+    // garbage if the state is PROCESS_SLOT_AVAILABLE.
 	process_state_t state;
 } process_t;
 
+/* Starts the process with the given filename */
 void process_start(const char *executable);
 
-process_id_t process_spawn(const char *executable );
+/* Run process in new thread, return PID of new process */
+process_id_t process_spawn(const char *executable);
 
+/* Run process in this thread, only returns if there is an error */
 int process_run(const char *executable);
 
+/* Returns the PID of the current process */
 process_id_t process_get_current_process( void );
 
+/* Stop the current process and the kernel thread in which it runs */
 void process_finish(int retval);
 
+/* Wait for the given process to terminate, returning its return
+ * value, and marking the process table entry as free */
 uint32_t process_join(process_id_t pid);
 
+/* Initialize process table. Should be called before any other process
+ * related calls */
 void process_init( void );
+
 #endif
