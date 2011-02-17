@@ -62,8 +62,8 @@ spinlock_t process_table_slock;
  * Returns the process ID of the currently running thread.
  */
 process_id_t process_get_current_process() {
-	thread_table_t *curEntry = thread_get_current_thread_entry();
-	return curEntry->process_id;
+	thread_table_t *my_thread = thread_get_current_thread_entry();
+	return my_thread->process_id;
 }
 
 
@@ -248,6 +248,7 @@ uint32_t process_join(process_id_t pid) {
 void process_finish(uint32_t retval) {
     interrupt_status_t intr_status;
     process_id_t pid;
+	thread_table_t *my_thread;
 
     // Find out who we are.
     pid = process_get_current_process();
@@ -263,6 +264,10 @@ void process_finish(uint32_t retval) {
     // Free our locks.
     spinlock_release(&process_table_slock);
     _interrupt_set_state(intr_status);
+
+    my_thread = thread_get_current_thread_entry();
+    vm_destroy_pagetable(my_thread->pagetable);
+    my_thread->pagetable = NULL;
 
     // Kill the thread.
     thread_finish();
