@@ -82,12 +82,6 @@ void kwrite(char *s)
 // that can return the actual length read by kread. This is used
 // by f.ex. syscall_read(), which calls kread_core() instead.
 void kread(char *s, int len) {
-	kread_core(s, len);
-}
-
-int kread_core(char *s, 
-           int len)
-{
     int ch;
     int count = 0;
 
@@ -97,7 +91,6 @@ int kread_core(char *s,
         count++;
     }
     s[count] = '\0';
-	return count;
 }
 
 /**
