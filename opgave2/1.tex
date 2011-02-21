@@ -1,3 +1,133 @@
 \section{Implementation of the process abstraction}
 
-% Exciting shizzle here
+\subsection{Processes and process table}
+
+We have chosen to implement our process structure as the struct seen in
+\autoref{process-t}.
+
+\lstset{caption=The process structure.,label=process-t,float}
+\begin{lstlisting}
+typedef struct {
+    // The name of the process.
+    char name[MAX_NAME_LENGTH];
+    // The return value of the process.
+    // Only relevant if the state is PROCESS_DYING.
+    uint32_t retval;
+    // The state of the process.
+    // Note that the values of all other fields are
+    // garbage if the state is PROCESS_SLOT_AVAILABLE.
+    process_state_t state;
+} process_t;
+\end{lstlisting}
+
+We found the need for three pieces of data to be stored; the name of the
+process, the return value, and the state it's currently in, represented
+by an enum shown in \autoref{process-state-t}.
+
+\lstset{caption=The process state enum.,label=process-state-t,float}
+\begin{lstlisting}
+typedef enum {
+    PROCESS_RUNNING,
+    PROCESS_DYING,
+    PROCESS_SLOT_AVAILABLE
+} process_state_t;
+\end{lstlisting}
+
+Since dynamic memory allocation isn't optimal in our kernel, we use a
+static array of these process structs as our process table.
+
+\subsection{Functions for working with processes}
+
+We found the need for implementing a few functions, in order to help
+encapsulating the treatment of processes.
+
+\subsubsection{\mono{process\_init}}
+Before anything else, we need to initialize the process table. This is done by
+setting the state of every process slot to \mono{PROCESS\_SLOT\_AVAILABLE} and
+resetting our spinlock.
+
+\subsubsection{\mono{process\_obtain\_slot}}
+We found the need for externally being able to obtain a process slot; namely for
+launching the main process.
+
+Alternatively, one could have chosen to spawn a new process in a new thread
+and kill off the old thread.
+
+Obtaining a slot is performed by scanning through the table, finding the first
+available slot and marking it as running. This is naturally safeguarded by
+disabling interrupts and spinlocking.
+
+If no process slot is found, we choose to kernel panic. Alternively, we could have
+used the sleep queue to wait for a slot to become free.
+
+\subsubsection{\mono{process\_start}}
+This we already given, but we found we had to modify it a bit to take a
+process id. This had to be done, as the thread process id only can be modified
+from within the thread itself. This gave us the problem that we couldn't set the
+PID of the thread from within \mono{process\_spawn}, which meant that the only
+way to return the process id of the newly spawned process was to let process\_start
+accept a PID as an argument.
+
+\subsubsection{\mono{process\_spawn}}
+Spawning a process is done in the obvious way, by obtaining a process id
+through \mono{process\_obtain\_slot}, then spawning a new thread that launches
+\mono{process\_start}.
+
+Or, rather, a shim that converts the \mono{process\_id\_t} to a \mono{uint32\_t},
+as casting function pointers isn't allowed. One could have let \mono{process\_start}
+take a \mono{uint32\_t}, rather than a \mono{process\_id\_t} to avoid this, but
+it seems very ugly to have a function that takes an integer as a process id, when
+we have a type dedicated to representing these.
+
+\subsubsection{\mono{process\_get\_current\_process}}
+This function simply queries the current thread for its process id.
+
+\subsubsection{\mono{process\_join}}
+\mono{process\_join} uses the sleep queue to ensure that we can join on living
+processes, as well as dead ones. We follow the method outlined in the Buenos
+Roadmap, section 5.2.1 for sleeping on a resource.
+
+The implementation can be seen in \autoref{process-join}.
+
+The resource we choose to sleep on is the address of the process slot, as it
+seems more likely to be unique than the process id, which simply is the number of
+the entry in the table.
+
+\lstset{caption=\mono{process\_join}.,label=process-join,float}
+\begin{lstlisting}
+uint32_t process_join(process_id_t pid) {
+    interrupt_status_t intr_status;
+    uint32_t retval;
+
+    // Disable interrupts and acquire resource lock
+    intr_status = _interrupt_disable();
+    spinlock_acquire(&process_table_slock);
+
+    // Sleep while the process isn't in its "dying" state.
+    while(process_table[pid].state != PROCESS_DYING) {
+        sleepq_add(&process_table[pid]);
+        spinlock_release(&process_table_slock);
+        thread_switch();
+        spinlock_acquire(&process_table_slock);
+    }
+
+    retval = process_table[pid].retval;
+    process_table[pid].state = PROCESS_SLOT_AVAILABLE;
+
+    // Restore interrupts and free our lock
+    spinlock_release(&process_table_slock);
+    _interrupt_set_state(intr_status);
+    return retval;
+}
+\end{lstlisting}
+
+\subsubsection{\mono{process\_finish}}
+Terminanting a process is accomplished by marking the process as dying and
+signalling the sleep queue, to allow for it to be joined on.
+
+Naturally, we lock this down by disabling interrupts and using our spinlock
+while working on our process table.
+
+
+
+
