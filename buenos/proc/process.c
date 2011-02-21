@@ -265,6 +265,9 @@ void process_finish(uint32_t retval) {
     spinlock_release(&process_table_slock);
     _interrupt_set_state(intr_status);
 
+    // Wake whomever may be sleeping for the process
+    sleepq_wake(&process_table[pid]);
+
     my_thread = thread_get_current_thread_entry();
     vm_destroy_pagetable(my_thread->pagetable);
     my_thread->pagetable = NULL;
