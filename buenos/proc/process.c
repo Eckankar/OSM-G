@@ -234,9 +234,9 @@ uint32_t process_join(process_id_t pid) {
 	}
 
 	retval = process_table[pid].retval;
+	process_table[pid].state = PROCESS_SLOT_AVAILABLE;
 
     // Restore interrupts and free our lock
-	process_table[pid].state = PROCESS_SLOT_AVAILABLE;
 	spinlock_release(&process_table_slock);
 	_interrupt_set_state(intr_status);
 	return retval;
