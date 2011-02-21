@@ -20,7 +20,7 @@ typedef struct {
 } process_t;
 \end{lstlisting}
 
-We found the need for three pieces of data to be stored; the name of the
+We found the need for three pieces of data; the name of the
 process, the return value, and the state it's currently in, represented
 by an enum shown in \autoref{process-state-t}.
 
@@ -38,8 +38,8 @@ static array of these process structs as our process table.
 
 \subsection{Functions for working with processes}
 
-We found the need for implementing a few functions, in order to help
-encapsulating the treatment of processes.
+We've implemented a few functions to assist in encapsulating the
+treatment of processes. These are outlined below.
 
 \subsubsection{\mono{process\_init}}
 Before anything else, we need to initialize the process table. This is done by
@@ -49,11 +49,9 @@ resetting our spinlock.
 This is called from the \mono{init} function in \mono{init/main.c}.
 
 \subsubsection{\mono{process\_obtain\_slot}}
-We found the need for externally being able to obtain a process slot; namely for
-launching the main process.
-
-Alternatively, one could have chosen to spawn a new process in a new thread
-and kill off the old thread.
+Because of how launching the main process works, we chose to make obtaining a
+process slot a separate function. Alternatively, one could have spawned a new
+process in a new thread and killed off the old thread.
 
 Obtaining a slot is performed by scanning through the table, finding the first
 available slot and marking it as running. This is naturally safeguarded by
@@ -63,12 +61,12 @@ If no process slot is found, we choose to kernel panic. Alternively, we could ha
 used the sleep queue to wait for a slot to become free.
 
 \subsubsection{\mono{process\_start}}
-This we already given, but we found we had to modify it a bit to take a
-process id. This had to be done, as the thread process id only can be modified
-from within the thread itself. This gave us the problem that we couldn't set the
-PID of the thread from within \mono{process\_spawn}, which meant that the only
-way to return the process id of the newly spawned process was to let process\_start
-accept a PID as an argument.
+The \mono{process\_start} function is already provided by Buenos, but we found a need to
+modify it. Threads must have their process id set, and the only way to modify it
+is from within the thread itself. This means you can't set the PID of the thread
+from within \mono{process\_spawn}. The only way, then, to return the process id of
+a newly spawned process, is to let the \mono{process\_start} function accept a PID
+as an argument. It is then responsible for looking up what to execute itself.
 
 \subsubsection{\mono{process\_spawn}}
 Spawning a process is done in the obvious way, by obtaining a process id
@@ -91,7 +89,7 @@ Roadmap, section 5.2.1 for sleeping on a resource.
 
 The implementation can be seen in \autoref{process-join}.
 
-The resource we choose to sleep on is the address of the process slot, as it
+The resource we've chosen to sleep on is the address of the process slot, as it
 seems more likely to be unique than the process id, which simply is the number of
 the entry in the table.
 
