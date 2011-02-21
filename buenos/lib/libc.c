@@ -77,10 +77,6 @@ void kwrite(char *s)
  * @param len The length of the buffer \texttt{s}.
  *
  */
-
-// Note: The 'meat' of kread has been moved into a function
-// that can return the actual length read by kread. This is used
-// by f.ex. syscall_read(), which calls kread_core() instead.
 void kread(char *s, int len) {
     int ch;
     int count = 0;
