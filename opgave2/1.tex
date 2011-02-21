@@ -46,6 +46,8 @@ Before anything else, we need to initialize the process table. This is done by
 setting the state of every process slot to \mono{PROCESS\_SLOT\_AVAILABLE} and
 resetting our spinlock.
 
+This is called from the \mono{init} function in \mono{init/main.c}.
+
 \subsubsection{\mono{process\_obtain\_slot}}
 We found the need for externally being able to obtain a process slot; namely for
 launching the main process.
