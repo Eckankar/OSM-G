@@ -2,4 +2,7 @@ halt
 calc
 exec
 hw
+threads
+threads_locks
+threads_rings
 *.map
