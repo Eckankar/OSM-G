@@ -10,3 +10,6 @@ The system calls
 amongst the \texttt{lock\_*} and \texttt{condition\_*} functions. As such, they 
 are merely wrapper-functions for their obvious counterparts, that aren't prefixed 
 by \texttt{syscall\_}.
+
+In addition to this, proper hooks for \texttt{\_syscall} to call each of the above were
+added to \mono{tests/lib.c} and \mono{tests/lib.h}.
