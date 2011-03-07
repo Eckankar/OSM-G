@@ -73,13 +73,13 @@ void condition_signal(cond_t *cond, lock_t *lock) {
     // Wake a waiting thread
     sleepq_wake(cond);
 
-    lock = lock; // What should we do with the lock?
+    lock = lock; // XXX: What should we do with the lock?
 }
 
 void condition_broadcast(cond_t *cond, lock_t *lock) {
     // Wake all waiting threads
     sleepq_wake_all(cond);
 
-    lock = lock; // What should we do with the lock?
+    lock = lock; // XXX: What should we do with the lock?
 }
 // end cond }}}
