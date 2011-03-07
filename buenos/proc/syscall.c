@@ -41,6 +41,7 @@
 #include "kernel/assert.h"
 #include "proc/process.h"
 #include "drivers/gcd.h"
+#include "kernel/lock_cond.h"
 #include "drivers/device.h"
 
 int syscall_read(int fhandle, void *buffer, int length) {
@@ -87,11 +88,9 @@ int syscall_join(int pid) {
 	return process_join(pid);
 }
 
-int syscall_fork(void (*func)(int), int arg)
-{
+int syscall_fork(void (*func)(int), int arg) {
     return process_fork(func, arg);
 }
-
 
 int syscall_lock_create(usr_lock_t *lock) {
 	return lock_reset(lock);

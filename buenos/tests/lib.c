@@ -184,6 +184,34 @@ int syscall_delete(const char *filename)
     return (int)_syscall(SYSCALL_DELETE, (uint32_t)filename, 0, 0);
 }
 
+// Locks
+int syscall_lock_create(usr_lock_t *lock) {
+    return (int)_syscall(SYSCALL_LOCK_CREATE, (uint32_t)lock, 0, 0);
+}
+
+void syscall_lock_acquire(usr_lock_t *lock) {
+    _syscall(SYSCALL_LOCK_ACQUIRE, (uint32_t)lock, 0, 0);
+}
+
+void syscall_lock_release(usr_lock_t *lock) {
+    _syscall(SYSCALL_LOCK_RELEASE, (uint32_t)lock, 0, 0);
+}
+
+// Conditional variables
+int syscall_condition_create(usr_cond_t *cond) {
+    return (int)_syscall(SYSCALL_COND_CREATE, (uint32_t)cond, 0, 0);
+}
+void syscall_condition_wait(usr_cond_t *cond, usr_lock_t *lock) {
+    _syscall(SYSCALL_COND_WAIT, (uint32_t)cond, (uint32_t)lock, 0);
+}
+void syscall_condition_signal(usr_cond_t *cond, usr_lock_t *lock) {
+    _syscall(SYSCALL_COND_SIGNAL, (uint32_t)cond, (uint32_t)lock, 0);
+}
+void syscall_condition_broadcast(usr_cond_t *cond, usr_lock_t *lock) {
+    _syscall(SYSCALL_COND_BROADCAST, (uint32_t)cond, (uint32_t)lock, 0);
+}
+
+
 /* The following functions are not system calls, but convenient
    library functions inspired by POSIX and the C standard library. */
 
