@@ -1,1 +1,62 @@
-\section{syscall\_fork}
+\section{\mono{syscall\_fork}}
+
+We have followed the implementation outlined in \mono{flertraadning.txt} for
+implementing this.
+
+Most of the implementation is taken directly from there, with the exception
+of a slightly better looking format for the syscall handler, as shown in
+\autoref{syscallhandler}, and completion of the outlined \mono{process_finish},
+as seen in \autoref{procfin}
+
+\lstset{caption=The syscall handler for \mono{SYSCALL\_FORK},
+        label=syscallhandler,float}
+\begin{lstlisting}
+case SYSCALL_FORK:
+    RET_REG(0) = syscall_fork((void (*)(int))ARG_REG(1), ARG_REG(2));
+    break;
+\end{lstlisting}
+\lstset{caption=\mono{process\_finish},
+        label=procfin,float}
+\begin{lstlisting}
+/**
+ * Terminates the current process and sets a return value
+ */
+void process_finish(uint32_t retval) {
+    interrupt_status_t intr_status;
+    process_id_t pid;
+    thread_table_t *my_thread;
+
+    // Find out who we are.
+    pid = process_get_current_process();
+    my_thread = thread_get_current_thread_entry();
+
+    // Ensure that we're the only ones touching the process table.
+    intr_status = _interrupt_disable();
+    spinlock_acquire(&process_table_slock);
+
+    // Mark the stack as free so new threads can reuse it.
+    process_free_stack(my_thread);
+
+    if(--process_table[pid].threads == 0) {
+        // Last thread in process; now we die.
+
+        // Mark ourself as dying.
+        process_table[pid].retval = retval;
+        process_table[pid].state = PROCESS_DYING;
+
+        vm_destroy_pagetable(my_thread->pagetable);
+
+        // Wake whomever may be sleeping for the process
+        sleepq_wake(&process_table[pid]);
+    }
+
+    // Free our locks.
+    spinlock_release(&process_table_slock);
+    _interrupt_set_state(intr_status);
+
+    my_thread->pagetable = NULL;
+
+    // Kill the thread.
+    thread_finish();
+}
+\end{lstlisting}
