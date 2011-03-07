@@ -1,15 +1,15 @@
-\section{Implementing lock\_t}
+\section{Implementing \mono{lock\_t}}
 
 The \mono{lock\_t} structure contains a spinlock and a condition,
 namely whether it is locked or not. This allows threads to wait on
 the 'locked' variable. The spinlock is there to assure atomic access
-to reading/writing lock\_t->locked. \autoref{lockt} details the struct
+to reading/writing \mono{lock\_t->locked}. \autoref{lockt} details the struct
 as defined in \mono{kernel/lock\_cond.h}.
 
 On acquiring / releasing a lock, interrupts are disabled to prevent
 interrupts messing things up.
 
-\lstset{caption=The lock\_t structure.,label=lockt,float}
+\lstset{caption=The \mono{lock\_t} structure.,label=lockt,float}
 \begin{lstlisting}
 typedef struct {
 	spinlock_t spinlock;
