@@ -26,7 +26,7 @@ void thread_function(void *arg){
     while(1) {
 
         syscall_lock_acquire(&baton_lock);
-        
+
         // Wait until baton is non-zero (meaning that the thread
         // has the baton)
         while(data->baton == 0) {

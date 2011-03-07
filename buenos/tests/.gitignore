@@ -4,5 +4,5 @@ exec
 hw
 threads
 threads_locks
-threads_rings
+threads_ring
 *.map
