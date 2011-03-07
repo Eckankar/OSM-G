@@ -1,0 +1,8 @@
+\section{New syscalls}
+The system calls \mono{syscall\_lock\_create},\mono{syscall\_lock\_acquire},
+\mono{syscall\_lock\_release}, \mono{syscall\_condition\_create},
+\mono{syscall\_condition\_wait}, \mono{syscall\_condition\_signal} \&
+\mono{syscall\_condition\_broadcast} all correspond to an existing function
+amongst the \mono{lock\_*} and \mono{condition\_*} functions. As such, they
+are merely wrapper-functions for their obvious counterparts, that aren't prefixed
+by \mono{syscall\_}.
