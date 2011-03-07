@@ -92,6 +92,31 @@ int syscall_fork(void (*func)(int), int arg)
     return process_fork(func, arg);
 }
 
+
+int syscall_lock_create(usr_lock_t *lock) {
+
+}
+
+void syscall_lock_acquire(usr_lock_t *lock) {
+
+}
+
+int condition_create(usr_cond_t *cond) {
+
+}
+
+void syscall_condition_wait(usr_cond_t *cond, usr_lock_t *lock) {
+
+}
+
+void syscall_condition_signal(usr_cond_t *cond, usr_lock_t *lock) {
+
+}
+
+void syscall_condition_broadcast(usr_cond_t *cond, usr_lock_t *lock) {
+
+}
+
 /**
  * Handle system calls. Interrupts are enabled when this function is
  * called.
