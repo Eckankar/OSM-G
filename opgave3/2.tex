@@ -1,1 +1,17 @@
-\section{Implementation of selected system calls}
+\section{Conditional variables}
+
+The implementation of conditional variables is pretty simple.
+
+A conditional variable is simply a \mono{void *}, as we had no data that
+needed to be stored inside of it.
+
+When waiting on a conditional variable, the thread is simply put on the
+sleep queue, and the given lock is released, to be relocked whenever it is
+reawakened.
+
+For signal and broadcast, we simply perform a \mono{sleepq_wake} and
+\mono{sleepq_wake_all}, respectively. As for why we're getting a lock, we're
+unsure.
+
+For resetting, we simply wake anything that may be sleeping on the conditional,
+just to make sure that everything will work the way we intend it.
