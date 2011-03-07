@@ -94,27 +94,31 @@ int syscall_fork(void (*func)(int), int arg)
 
 
 int syscall_lock_create(usr_lock_t *lock) {
-
+	return lock_reset(lock);
 }
 
 void syscall_lock_acquire(usr_lock_t *lock) {
-
+	lock_acquire(lock);
 }
 
-int condition_create(usr_cond_t *cond) {
+void syscall_lock_release(usr_lock_t *lock) {
+	lock_release(lock);
+}
 
+int syscall_condition_create(usr_cond_t *cond) {
+	return condition_reset(cond);
 }
 
 void syscall_condition_wait(usr_cond_t *cond, usr_lock_t *lock) {
-
+	condition_wait(cond, lock);
 }
 
 void syscall_condition_signal(usr_cond_t *cond, usr_lock_t *lock) {
-
+	condition_signal(cond, lock);
 }
 
 void syscall_condition_broadcast(usr_cond_t *cond, usr_lock_t *lock) {
-
+	condition_broadcast(cond, lock);
 }
 
 /**
@@ -159,6 +163,30 @@ void syscall_handle(context_t *user_context)
     case SYSCALL_FORK:
         RET_REG(0) = syscall_fork((void (*)(int))ARG_REG(1), ARG_REG(2));
         break;
+	case SYSCALL_LOCK_CREATE:
+		RET_REG(0) = syscall_lock_create((usr_lock_t*)ARG_REG(1));
+		break;
+	case SYSCALL_LOCK_ACQUIRE:
+		syscall_lock_acquire((usr_lock_t*)ARG_REG(1));
+		break;
+	case SYSCALL_LOCK_RELEASE:
+		syscall_lock_release((usr_lock_t*)ARG_REG(1));
+		break;
+	case SYSCALL_COND_CREATE:
+		RET_REG(0) = syscall_condition_create((usr_cond_t*)ARG_REG(1));
+		break;
+	case SYSCALL_COND_WAIT:
+		syscall_condition_wait((usr_cond_t*)ARG_REG(1),
+								(usr_lock_t*)ARG_REG(2));
+		break;
+	case SYSCALL_COND_BROADCAST:
+		syscall_condition_broadcast((usr_cond_t*)ARG_REG(1),
+								(usr_lock_t*)ARG_REG(2));
+		break;
+	case SYSCALL_COND_SIGNAL:
+		syscall_condition_signal((usr_cond_t*)ARG_REG(1),
+								(usr_lock_t*)ARG_REG(2));
+		break;
     default:
         KERNEL_PANIC("Unhandled system call\n");
     }

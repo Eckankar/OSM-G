@@ -57,6 +57,9 @@
 #define SYSCALL_LOCK_ACQUIRE 0x302
 #define SYSCALL_LOCK_RELEASE 0x303
 #define SYSCALL_COND_CREATE 0x311
+#define SYSCALL_COND_WAIT 0x312
+#define SYSCALL_COND_BROADCAST 0x313
+#define SYSCALL_COND_SIGNAL 0x314
 
 /* When userland program reads or writes these already open files it
  * actually accesses the console.
