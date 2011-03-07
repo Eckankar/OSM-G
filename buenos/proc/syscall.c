@@ -86,6 +86,12 @@ int syscall_exec(const char *filename) {
 int syscall_join(int pid) {
 	return process_join(pid);
 }
+
+int syscall_fork(void (*func)(int), int arg)
+{
+    return process_fork(func, arg);
+}
+
 /**
  * Handle system calls. Interrupts are enabled when this function is
  * called.
@@ -124,6 +130,9 @@ void syscall_handle(context_t *user_context)
         break;
 	case SYSCALL_JOIN:
         RET_REG(0) = syscall_join((int)ARG_REG(1));
+        break;
+    case SYSCALL_FORK:
+        RET_REG(0) = syscall_fork((void (*)(int))ARG_REG(1), ARG_REG(2));
         break;
     default:
         KERNEL_PANIC("Unhandled system call\n");

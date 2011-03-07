@@ -42,6 +42,7 @@
 #define MAX_NAME_LENGTH 255
 #define MAX_PROCESSES   64
 #define USERLAND_STACK_TOP 0x7fffeffc
+#define USERLAND_STACK_MASK (PAGE_SIZE_MASK*CONFIG_USERLAND_STACK_SIZE)
 
 typedef int process_id_t;
 
@@ -61,6 +62,12 @@ typedef struct {
     // Note that the values of all other fields are
     // garbage if the state is PROCESS_SLOT_AVAILABLE.
 	process_state_t state;
+    // Number of threads in the process.
+    int threads;
+    // End of lowest stack
+    uint32_t stack_end;
+    // Start of lowest free stack (0 if none). 
+    uint32_t bot_free_stack;
 } process_t;
 
 /* Starts the process with the given filename */
@@ -85,5 +92,8 @@ uint32_t process_join(process_id_t pid);
 /* Initialize process table. Should be called before any other process
  * related calls */
 void process_init( void );
+
+/* Forks a new thread in the current process */
+int process_fork(void (*func)(int), int arg);
 
 #endif
