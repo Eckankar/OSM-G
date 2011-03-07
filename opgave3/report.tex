@@ -1,0 +1,175 @@
+\documentclass[9pt, a4paper]{article}
+
+% LANGUAGE
+\usepackage[utf8]{inputenc}
+%\usepackage[english]{babel}
+\usepackage{synttree}
+
+\usepackage{longtable}
+
+\usepackage{units}
+
+% MATH
+\usepackage{amssymb, amsmath}
+
+
+% COLORS
+\usepackage[usenames,dvipsnames]{color}
+
+% GRAPHICS
+\usepackage{graphicx}
+
+% TABLE
+\usepackage[table]{xcolor}
+\definecolor{tableShade}{RGB}{245,245,245}
+\usepackage{multirow, booktabs}
+
+% LINKS
+\usepackage{url}
+\usepackage[pdftex,colorlinks=true]{hyperref}
+\hypersetup
+{
+	linkcolor=RoyalBlue,
+	anchorcolor=RoyalBlue,
+	citecolor=RoyalBlue,
+	urlcolor=RoyalBlue,
+  pdftitle={OSM Assignment 1},
+  pdfauthor={Martin Grunbaum and Sebastian Paaske Tørholm},
+  pdfkeywords={OSM, C},
+  pdfstartview={FitV},
+	bookmarksnumbered
+}
+
+
+% FONT
+\usepackage[T1]{fontenc}
+\usepackage{mathpazo}
+
+% CAPTIONS
+\usepackage[hang,small,bf]{caption}
+
+% KU FRONT
+\usepackage[babel, en]{ku-forside}
+\titel{Group Assignment 3}
+\undertitel{Styresystemer og Multiprogrammering}
+\opgave{}
+\forfatter{Martin Grunbaum(31-03-88) \& Sebastian Tørholm(23-06-88)}
+\dato{February 21st, 2011}
+\vejleder{}
+
+% Stopping floats
+\usepackage{placeins}
+
+%\def\Authors{Martin Grunbaum, Oleksandr Shturmov, Jan Kaihøj Søe}
+%\def\authors{Martin G., Oleksandr S., Jan S.}
+%\def\Binfo{31-03-1988, 17-11-1990 \& 22-09-1989}
+%\def\binfo{31-03-88\ \ \ , 17-11-90 \ \ \ \ \ \& 22-09-89 }
+
+% PDF
+\usepackage{pdfpages}
+
+
+
+% HEADERS
+\usepackage{fullpage, fancyhdr, lastpage}
+
+\pagestyle{fancy}
+\lhead{\mono{Martin G., Sebastian T.}\\\mono{31-03-88, 23-06-88}}
+\chead{\mono{Styresystemer og Multiprogrammering}\\\mono{Group Assignment 3}}
+\rhead{\mono{DIKU}\\\mono{February 21th, 2011}}
+\cfoot{\thepage/\pageref{LastPage}}
+\renewcommand{\headrulewidth}{0in}
+\renewcommand{\headsep}{40pt}
+\renewcommand{\textheight}{640pt}
+
+
+\usepackage{listings}
+
+
+\lstset{
+	tabsize=2,
+	language=C,
+%	numbers=left,
+	breaklines=true,
+	basicstyle=\ttfamily,
+	keywordstyle=\color{RoyalBlue}
+}
+
+% USEFULL COMMANDS
+\newcommand{\mono}[1]{{\ttfamily#1}}
+\newcommand{\its}[1]{{\itshape#1}}
+\newcommand{\cfgvar}[1]{{\underline{#1}}}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\newcommand{\nref}[1]{\ref{#1}/(\pageref{#1})}
+
+\newcommand{\nafig}[3][3in]
+{
+	\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=#1]{img/#2}
+	\caption[]{#3}
+	\label{fig:#2}
+	\end{figure}
+}
+
+\newcommand{\nafigw}[3][\textwidth]
+{
+	\begin{figure*}[t!]
+	\centering
+	\includegraphics[width=#1]{img/#2}
+	\caption[]{#3}
+	\label{fig:#2}
+	\end{figure*}
+}
+
+\newcommand{\natabw}[5]
+{
+	\begin{table*}[htbp!]
+	\centering
+	\rowcolors{2}{tableShade}{white}
+	\begin{tabular}{#3}
+	\hline
+	#4\\
+	\hline
+	#5\\
+	\hline
+	\end{tabular}
+	\caption[]{#2}
+	\label{tab:#1}
+	\end{table*}
+}
+
+\newcommand{\fun}[2]{\mono{$\proc{#1}$ #2}}
+\newcommand{\fn}[1]{\mono{{\color{RoyalBlue}#1}}}
+
+
+
+\newcommand{\screenref}[1]{Figure \nref{fig:#1} presents a screenshot.}
+
+%\renewcommand{\thesubsection}{\alph{subsection})}
+%\renewcommand{\thesubsubsection}{\roman{subsubsection}.}
+
+%\usepackage[utf8]{inputenc}
+
+\parindent 0pt
+\parskip 10pt
+
+% \usepackage{clrscode3e}
+
+% COMMAND REDEFINITIONS
+\renewcommand{\figurename}{Figure}
+
+\RequirePackage{graphics}
+
+% DOCUMENT
+\begin{document}
+
+\maketitle
+\tableofcontents
+\include{1}
+\include{2}
+%\bibliographystyle{amsalpha}
+%\bibliography{./osm}
+
+\end{document}
+
