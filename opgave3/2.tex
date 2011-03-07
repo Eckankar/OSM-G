@@ -1,34 +1,17 @@
-\section{Implementation of selected system calls}
-We were tasked with implementing \mono{syscall\_exit},
-\mono{syscall\_exec}, \mono{syscall\_join}, \mono{syscall\_write}
-and \mono{syscall\_read}. Due to the utility functions that we
-wrote in order to deal with processes, this was a very straight-forward
-task.
+\section{Conditional variables}
 
-\subsection{\mono{syscall\_read} and \mono{syscall\_write}}
-Gathering inspiration from \mono{init/main.c}, these functions
-were implemented by first fetching a reference to the
-\mono{YAMS\_TYPECODE\_TTY} device, and then using its
-generic device to read and write from.
+The implementation of conditional variables is pretty simple.
 
-We initially attempted to implement these functions with
-\mono{kwrite} and \mono{kread}, by altering them to return
-the amount read/written. This, for obvious reasons, did not work
-as we had intended!
+A conditional variable is simply a \mono{void *}, as we had no data that
+needed to be stored inside of it.
 
-The functions return $-1$ if you attempt to read or write to something
-other than \mono{FILEHANDLE\_STDIN} \\ \mono{FILEHANDLE\_STDOUT}.
+When waiting on a conditional variable, the thread is simply put on the
+sleep queue, and the given lock is released, to be relocked whenever it is
+reawakened.
 
-\subsection{\mono{syscall\_exit}}
-This function simply needs to exit out with a given return value. The
-previously written \mono{process\_finish} function is exactly what is
-needed, so the function simply calls it.
+For signal and broadcast, we simply perform a \mono{sleepq_wake} and
+\mono{sleepq_wake_all}, respectively. As for why we're getting a lock, we're
+unsure.
 
-\subsection{\mono{syscall\_exec}}
-Like \mono{syscall\_exit}, this is simply a matter of using a function
-that we already wrote - Namely, \mono{process\_spawn}.
-
-\subsection{\mono{syscall\_join}}
-The \mono{process\_join} function performs this task, and
-\mono{syscall\_join} simply returns the value returned by 
-\mono{process\_join}
+For resetting, we simply wake anything that may be sleeping on the conditional,
+just to make sure that everything will work the way we intend it.
