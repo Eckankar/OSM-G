@@ -59,14 +59,16 @@ int condition_reset(cond_t *cond) {
 
 void condition_wait(cond_t *cond, lock_t *lock) {
 	interrupt_status_t intr_status;
+	intr_status = _interrupt_disable();
 
     // No matter what, sleep.
-	intr_status = _interrupt_disable();
     sleepq_add(cond);
-	_interrupt_set_state(intr_status);
 
-    // Unlock the acquired lock and switch out
+    // Unlock the acquired lock
     lock_release(lock);
+
+    // Re-enable interrupts and switch out
+    _interrupt_set_state(intr_status);
     thread_switch();
 
     // Re-acquire lock before returning
