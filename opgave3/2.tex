@@ -9,8 +9,8 @@ When waiting on a conditional variable, the thread is simply put on the
 sleep queue, and the given lock is released, to be relocked whenever it is
 reawakened.
 
-For signal and broadcast, we simply perform a \mono{sleepq_wake} and
-\mono{sleepq_wake_all}, respectively. As for why we're getting a lock, we're
+For signal and broadcast, we simply perform a \mono{sleepq\_wake} and
+\mono{sleepq\_wake\_all}, respectively. As for why we're getting a lock, we're
 unsure.
 
 For resetting, we simply wake anything that may be sleeping on the conditional,
