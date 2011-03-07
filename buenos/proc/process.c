@@ -287,9 +287,9 @@ void process_finish(uint32_t retval) {
     spinlock_acquire(&process_table_slock);
 
     // Mark the stack as free so new threads can reuse it.
-    process_free_stack(thread);
+    process_free_stack(my_thread);
 
-    if(--process_table[my_pid].threads == 0) {
+    if(--process_table[pid].threads == 0) {
         // Last thread in process; now we die.
 
         // Mark ourself as dying.

@@ -1,6 +1,8 @@
 #ifndef BUENOS_KERNEL_LOCK_COND_H
 #define BUENOS_KERNEL_LOCK_COND_H
 
+#include "kernel/spinlock.h"
+
 // Lock-related things
 typedef struct {
 	spinlock_t spinlock;
