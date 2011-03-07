@@ -50,7 +50,7 @@
 
 #include <stdarg.h>
 #include <stddef.h>
-
+#include "kernel/lock_cond.h"
 #include "lib/types.h"
 
 #define MIN(arg1,arg2) ((arg1) > (arg2) ? (arg2) : (arg1))
