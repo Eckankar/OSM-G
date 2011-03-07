@@ -48,18 +48,32 @@ void lock_acquire(lock_t *lock) {
 /// end locks }}}
 // Conditional variables {{{
 int condition_reset(cond_t *cond) {
+    // Wake anything that may be waiting.
+    sleepq_wake_all(cond);
 
+    // XXX: What is this supposed to return?
+    return 0;
 }
 
 void condition_wait(cond_t *cond, lock_t *lock) {
+    // No matter what, sleep.
+    sleepq_add(cond);
 
+    // Unlock the acquired lock and switch out
+    lock_release(lock);
+    thread_switch();
+
+    // Re-acquire lock before returning
+    lock_acquire(lock);
 }
 
 void condition_signal(cond_t *cond, lock_t *lock) {
-
+    // Wake a waiting thread
+    sleepq_wake(cond);
 }
 
 void condition_broadcast(cond_t *cond, lock_t *lock) {
-
+    // Wake all waiting threads
+    sleepq_wake_all(cond);
 }
 // end cond }}}
