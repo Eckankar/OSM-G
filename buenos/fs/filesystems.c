@@ -36,12 +36,14 @@
 
 #include "fs/filesystems.h"
 #include "fs/tfs.h"
+#include "fs/slim.h"
 #include "drivers/device.h"
 
 /* NULL terminated table of all available filesystems. */
 
 static filesystems_t filesystems[] = {
     {"TFS", &tfs_init},
+	{"SLIM32", &slim_init},
     { NULL, NULL} /* Last entry must be a NULL pair. */ 
 };
 
