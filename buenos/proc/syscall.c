@@ -44,6 +44,7 @@
 #include "kernel/lock_cond.h"
 #include "drivers/device.h"
 
+// TODO Test this
 int syscall_read(int fhandle, void *buffer, int length) {
 	device_t *dev;
 	gcd_t *gcd;
@@ -56,10 +57,13 @@ int syscall_read(int fhandle, void *buffer, int length) {
 		if(gcd == NULL) return -1;
 
 		return gcd->read(gcd, buffer, length);
+	} else {
+	// Read at most length bytes from fhandle.
+		return vfs_read((openfile_t)fhandle, buffer, length);
 	}
-	return -1;
 }
 
+// TODO Redo to allow files to be written to
 int syscall_write(int fhandle, const void *buffer, int length) {
 	device_t *dev;
 	gcd_t *gcd;
@@ -72,8 +76,9 @@ int syscall_write(int fhandle, const void *buffer, int length) {
 		if(gcd == NULL) return -1;
 
 		return gcd->write(gcd, buffer, length);
+	} else {
+		return vfs_write((openfile_t)fhandle, buffer, length);
 	}
-	return -1;
 }
 
 void syscall_exit(int retval) {
@@ -118,6 +123,26 @@ void syscall_condition_signal(usr_cond_t *cond, usr_lock_t *lock) {
 
 void syscall_condition_broadcast(usr_cond_t *cond, usr_lock_t *lock) {
 	condition_broadcast(cond, lock);
+}
+
+int syscall_open(const char *filename) {
+	return vfs_open(filename);
+}
+
+int syscall_close(int filehandle) {
+	return vfs_close((openfile_t)filehandle);
+}
+
+int syscall_create(const char *filename, int size) {
+	return vfs_create(filename, size);
+}
+
+int syscall_delete(const char *filename) {
+	return vfs_remove(filename);
+}
+
+void syscall_seek(int filehandle, int offset) {
+	return vfs_seek((openfile_t)filehandle, offset);
 }
 
 /**
@@ -186,6 +211,20 @@ void syscall_handle(context_t *user_context)
 		syscall_condition_signal((usr_cond_t*)ARG_REG(1),
 								(usr_lock_t*)ARG_REG(2));
 		break;
+	case SYSCALL_VFS_OPEN:
+		RET_REG(0) = syscall_open((const char*)ARG_REG(1));
+		break;
+	case SYSCALL_VFS_CLOSE:
+		RET_REG(0) = syscall_close((int)ARG_REG(1));
+		break;
+	case SYSCALL_VFS_CREATE:
+		RET_REG(0) = syscall_create((const char *)ARG_REG(1),(int)ARG_REG(2));
+		break;
+	case SYSCALL_VFS_DELETE:
+		RET_REG(0) = syscall_delete((const char *)ARG_REG(1));
+		break;
+	case SYSCALL_VFS_SEEK:
+		syscall_seek((int)ARG_REG(1), (int)ARG_REG(2));
     default:
         KERNEL_PANIC("Unhandled system call\n");
     }

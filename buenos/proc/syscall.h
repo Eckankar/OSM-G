@@ -60,6 +60,13 @@
 #define SYSCALL_COND_WAIT 0x312
 #define SYSCALL_COND_BROADCAST 0x313
 #define SYSCALL_COND_SIGNAL 0x314
+#define SYSCALL_VFS_OPEN 0x401
+#define SYSCALL_VFS_CLOSE 0x402
+#define SYSCALL_VFS_CREATE 0x403
+#define SYSCALL_VFS_DELETE 0x404
+#define SYSCALL_VFS_SEEK 0x405
+#define SYSCALL_VFS_READ 0x406
+#define SYSCALL_VFS_WRITE 0x407
 
 /* When userland program reads or writes these already open files it
  * actually accesses the console.
